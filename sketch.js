@@ -1,3 +1,4 @@
+let cnv;
 let mic, fft;
 let centerY;
 let triggerActive = false;
@@ -106,7 +107,10 @@ let precomputedSVG = {};
 
 function setup() {
   let canvasSize = min(windowWidth, windowHeight);
-  createCanvas(canvasSize, canvasSize);
+  cnv = createCanvas(canvasSize, canvasSize);
+
+  centerCanvas();   // ⭐ 가로형 태블릿에서도 캔버스가 중앙에 오게
+
   centerY = height / 2;
 
   mic = new p5.AudioIn();
@@ -117,13 +121,18 @@ function setup() {
 
   preloadSVGs();
 
-  // 5초마다 랜덤 SVG 트리거
   setInterval(() => {
     let r = floor(random(svgPaths.length));
     mySVGPoints = precomputedSVG[r];
     triggerActive = true;
     triggerTime = millis();
   }, 5000);
+}
+
+function centerCanvas() {
+  let x = (windowWidth - width) / 2;
+  let y = (windowHeight - height) / 2;
+  cnv.position(x, y);
 }
 
 function draw() {
@@ -312,8 +321,9 @@ function getSmoothWaveform() {
 function windowResized() {
   let canvasSize = min(windowWidth, windowHeight);
   resizeCanvas(canvasSize, canvasSize);
+
   centerY = height / 2;
 
-  // 캔버스 크기 바뀌면 다시 스케일
   preloadSVGs();
+  centerCanvas();   // ⭐ 반드시 필요!
 }
